@@ -1,0 +1,21 @@
+# Data never goes into git
+data/
+*.parquet
+*.duckdb
+*.duckdb.wal
+
+# Safety net for raw download formats outside data/
+*.zip
+*.bz2
+*.jsonl
+
+# Python / tooling
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets and personal settings
+.env
+.claude/settings.local.json

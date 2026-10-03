@@ -1,0 +1,43 @@
+[project]
+name = "football-modelling"
+version = "0.1.0"
+description = "Unified open football data foundation: raw sources, one schema, cross-provider crosswalks."
+authors = [
+    { name = "lucagem29", email = "luca.gemballa99@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "duckdb>=1.5.6",
+    "kloppy>=3.19.0",
+    "lightgbm>=4.7.0",
+    "mplsoccer>=1.8.1",
+    "pandas>=2.2,<3",
+    "polars>=1.44.2",
+    "pyarrow>=25.0.1",
+    "requests>=2.34.2",
+    "socceraction>=1.5.3",
+    "statsbombpy>=1.22.0",
+    "tqdm>=4.70.1",
+]
+
+
+[build-system]
+requires = ["uv_build>=0.11.11,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.10",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
