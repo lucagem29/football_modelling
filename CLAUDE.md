@@ -63,5 +63,7 @@ uv add <pkg>    /  uv add --dev <pkg>     # never pip install
 ## Pointers
 
 - docs/data-sources.md: every source, URL, licence, status, row counts, sync level.
+- docs/schema.md: unified tables and crosswalk tables, columns and types, ID rules.
+- .claude/skills/add-data-source: the fixed workflow for adding a source.
 - docs/decisions.md: design decisions log.
 - tasks/: the planned steps, in order.
