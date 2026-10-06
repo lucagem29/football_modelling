@@ -20,7 +20,7 @@ Use the top-level files. Keep the dated folders untouched in raw.
 socceraction 1.5.x requires `pandas>=2.1.1,<3`. Without the cap uv picks pandas 3 and falls
 back to socceraction 1.1.1 (2021). Lift the cap when socceraction supports pandas 3.
 
-## 2026-10-03: Pitch origin, direction and match_id format (proposed, see schema.md)
+## 2026-10-03: Pitch origin, direction and match_id format (decided 2026-10-06, see schema.md)
 
 - Origin at the bottom-left corner (SPADL), not the centre, so events and tracking share one
   frame without conversion.
@@ -65,3 +65,16 @@ The website only carries ratings from about 2022-09. Instead we compute Elo ours
 open results (world_results ODC-BY, football-data.co.uk, international results CC0): full
 history, own formula, no licence question. The `clubelo` loader stays for when registration
 opens. Storage stays small: 1.3M results are 16 MB; one rating row per team per match.
+
+## 2026-10-06: Schema choices follow common practice
+
+- Pitch 105 x 68 m, origin bottom-left: the SPADL convention used by socceraction, VAEP and xT.
+  Tracking providers (TRACAB, PFF, SkillCorner) put the origin at the centre; converting is a
+  shift of (+52.5, +34).
+- Direction: events per acting team (SPADL); tracking with the home team always attacking left
+  to right (kloppy `Orientation.STATIC_HOME_AWAY`).
+- IDs: like most multi-provider setups, every row keeps the provider id and crosswalk tables map
+  them to one canonical id. There is no shared standard for that canonical id, so we keep the
+  readable `<date>_<home>_<away>` key. Reep / Wikidata ids are stored in team_crosswalk and
+  player_crosswalk where they exist; they cannot be the key itself because Reep has no
+  national teams (no Germany, no Argentina), so WC matches would have no id.
