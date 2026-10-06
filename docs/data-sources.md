@@ -63,6 +63,43 @@ Row counts are filled in when a source is standardized.
 - football-data.co.uk: https://www.football-data.co.uk/data.php
 - Club Elo: http://clubelo.com (API at http://api.clubelo.com)
 
+## Aggregate data (no events, no tracking)
+
+| Source | Scope | Licence | Status | Rows |
+|---|---|---|---|---|
+| FIFA WC 2026 Post Tournament Analysis | tournament + team aggregates, 2018/2022/2026 | data (c) FIFA | downloaded | 159 + 238 + 73 + 543 pages |
+| FIFA WC 2026 match reports (community) | 104 matches, match/team/player tables | data (c) FIFA; parsed by a community repo | downloaded | 21 CSVs, 16 MB |
+
+FIFA publishes no raw event or tracking data for 2026. Everything here is aggregates FIFA
+derived from its optical tracking. Data (c) FIFA; cite the source when publishing.
+Local folder: `data/raw/fifa_wc2026/` (README.md there describes every file).
+
+**Post Tournament Analysis** (FIFA Football Performance Insights, PDF, 546 pages, Oct 2026)
+- `post_tournament_analysis/tournament_comparison.csv`: 53 metrics x FWC2018/2022/2026,
+  transcribed by hand from the chart slides (pages 9-38).
+- `team_rankings.csv`: top-16 teams per metric as shown in the charts (not all 48 teams),
+  plus the back-three build-up share (page 47, 30 teams). FIFA three-letter team codes.
+- `key_findings.csv`: 73 numbered key findings from the thematic chapters, with page.
+- `pages_text.jsonl`: text of every page with chapter label.
+- Chart values were read from rendered slides: rounded as displayed, stacked totals may differ
+  from the sum of parts by 0.1. On page 19 (stacked bar) only the total is sorted; the
+  take-on and step-in parts are not. Check the `normalisation` column: some set-play metrics
+  are per match, others per team per match.
+- Not transcribed: shot/goal location heatmaps (pp. 14-15), goals vs xG scatter (p. 16),
+  charts inside the thematic chapters (pp. 39+).
+- The PDF (117 MB) is not in the repo (`*.pdf` is gitignored). Rebuild:
+  `uv run python -m football_modelling.ingest.fifa_wc2026.post_tournament_analysis <pdf>`
+  (needs `pdftotext`). The chart values themselves live in code, in
+  `src/football_modelling/ingest/fifa_wc2026/chart_values_part*.py`.
+
+**Match reports (community)**: https://github.com/Alamyy/Worldcup26 (not affiliated with FIFA),
+parsed from the 104 FIFA Training Centre post-match reports: matches, teams, players,
+appearances, attempts, passing-network edges, physical data, set plays, pressure and more.
+Team codes match the FIFA codes in team_rankings.csv. In `team_key_stats.csv`, the 104 rows
+for the in-contest share of possession have team `CONTEST` and no `match_team_id`.
+- Fetch / refresh: `uv run python -m football_modelling.ingest.fifa_wc2026.match_reports`
+  (skips existing files; delete `match_reports_community/` to pull a newer upstream commit).
+
 ## Tools
 
 - kloppy (loads most providers into one model): https://github.com/PySport/kloppy

@@ -8,6 +8,7 @@ data/
 *.zip
 *.bz2
 *.jsonl
+*.pdf
 
 # Python / tooling
 .venv/

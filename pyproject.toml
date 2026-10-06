@@ -36,6 +36,10 @@ dev = [
 line-length = 100
 target-version = "py311"
 
+[tool.ruff.format]
+# Hand-transcribed chart tables keep their compact one-row-per-line layout
+exclude = ["src/football_modelling/ingest/fifa_wc2026/chart_values_part*.py"]
+
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
 

@@ -46,3 +46,13 @@ upstream and compressed in place.
 Codex's first-batch scripts were written into `data/raw/` (not versioned). They are ported to
 one module per source in `ingest/` and the originals kept in `data/raw/_codex/` for reference.
 Each run writes `data/raw/<source>/_manifest_<name>.json` (commit or article, per-file status).
+
+## 2026-10-06: FIFA WC 2026 data lives in data/raw/, its scripts in ingest/fifa_wc2026/
+
+The dataset arrived as a folder with CSVs, a JSONL and scripts. Following the repo rules, the
+data went to `data/raw/fifa_wc2026/` (never committed) and the scripts became the package
+`ingest/fifa_wc2026/`. The shell fetch script was rewritten as a Python module using the
+shared GitHub mirror (works from any folder, pins the upstream commit in a manifest). The
+hand-transcribed chart values are code, so they are versioned and the CSVs can be rebuilt
+from them; the shipped CSVs were checked to be identical to the code output. The chart
+value files are excluded from `ruff format` to keep their compact table layout.
