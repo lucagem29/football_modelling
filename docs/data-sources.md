@@ -10,7 +10,7 @@ per-file status. Disk size is as stored (large JSON/XML gzip-compressed, see dec
 
 | Source | Module | Scope | Licence | Status | On disk |
 |---|---|---|---|---|---|
-| StatsBomb Open Data (Hudl) | `statsbomb` | 80 competition-seasons, 4,235 matches, 426 with 360 frames | StatsBomb terms: attribution + logo when publishing | downloaded | 1.6 GB (16 GB raw) |
+| StatsBomb Open Data (Hudl) | `statsbomb` | 80 competition-seasons, 4,235 matches, 426 with 360 frames | StatsBomb terms: attribution + logo when publishing | standardized: WC 2022 (64 matches: 138,946 events, 3,084,800 360 rows, 21,763 shot-frame rows) | 1.6 GB (16 GB raw) |
 | Wyscout (Pappalardo et al.) | `wyscout` | ~1,941 matches | CC BY 4.0 | downloaded | 77 MB (zips) |
 | Impect | `impect` | Bundesliga 2023/24, all 306 matches | Impect terms (LICENSE.pdf): credit Impect + logo | downloaded | 126 MB (3.2 GB raw) |
 

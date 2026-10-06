@@ -78,3 +78,16 @@ opens. Storage stays small: 1.3M results are 16 MB; one rating row per team per 
   readable `<date>_<home>_<away>` key. Reep / Wikidata ids are stored in team_crosswalk and
   player_crosswalk where they exist; they cannot be the key itself because Reep has no
   national teams (no Germany, no Argentina), so WC matches would have no id.
+
+## 2026-10-06: StatsBomb standardization choices
+
+- socceraction's StatsBomb loader is used as is; its one JSON-reading function is wrapped so it
+  opens our `.json.gz` files. Match metadata comes from the raw match file, because
+  socceraction's games table drops team names.
+- `multimethod<2` is pinned: socceraction pins pandera 0.17, which imports a function that
+  multimethod 2.0 removed (`ImportError: cannot import name 'overload'`).
+- The first provider seeds the canonical `team_id` (slug of its team name); later providers map
+  onto it in team_crosswalk. StatsBomb is the seed for WC 2022.
+- One Parquet file per match per table, so re-runs skip finished matches and a crash loses at
+  most one match. DuckDB reads them all through one glob per table.
+- Shot freeze frames get the shooter added as the actor row (StatsBomb leaves it out).

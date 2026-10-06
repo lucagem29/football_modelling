@@ -1,7 +1,7 @@
 # Unified schema
 
-All tables are Parquet under `data/processed/<table>/source=<source>/` (crosswalks under
-`data/crosswalk/`). DuckDB views in `src/football_modelling/db.py` read them with
+All tables are Parquet under `data/processed/<table>/source=<source>/`, one file per match
+(`<source match id>.parquet`), crosswalks under `data/crosswalk/`. DuckDB views in `src/football_modelling/db.py` read them with
 `hive_partitioning = true`, so the `source` column (and `match_id` for tracking) comes from the
 folder name, not from inside the file.
 
@@ -43,6 +43,10 @@ folder name, not from inside the file.
 | venue | string | |
 | has_events, has_tracking, has_freeze_frames | bool | |
 
+StatsBomb extra columns: `sb_kick_off` (raw, no time zone, so `kickoff_utc` stays null),
+`sb_competition_id`, `sb_season_id`, `sb_match_week`, `sb_referee`, `sb_has_360`.
+Shootout scores are counted from the period-5 penalties in the events.
+
 ### events (SPADL + provider columns)
 | column | type | notes |
 |---|---|---|
@@ -59,6 +63,11 @@ folder name, not from inside the file.
 | bodypart_name | string | foot, head, other, ... |
 | `<tag>_*` | any | provider-specific (e.g. `sb_xg`, `pff_pressure_type`) |
 
+StatsBomb columns: `sb_type` (original event type), `sb_possession`, `sb_play_pattern`,
+`sb_position`, `sb_under_pressure`, `sb_counterpress`, `sb_xg`, `sb_extra` (the full
+type-specific block as JSON, nothing dropped), `sb_visible_area_360` (polygon as JSON).
+Actions socceraction adds itself (dribbles = carries between events) have no `sb_` values.
+
 ### freeze_frames
 Positions of players around one event (StatsBomb shot freeze frames and 360 frames).
 | column | type | notes |
@@ -71,6 +80,9 @@ Positions of players around one event (StatsBomb shot freeze frames and 360 fram
 | actor | bool | the acting player |
 | keeper | bool | |
 | x, y | float32 | meters, same direction as the event |
+
+StatsBomb shot frames leave out the shooter; we add the shooter as the `actor` row at the shot
+location so every frame is complete. 360 frames are anonymous (`source_player_id` null).
 
 ### tracking (one Parquet file per match)
 Path: `data/processed/tracking/source=<source>/match_id=<match_id>/part-0.parquet`.
@@ -102,6 +114,9 @@ Long format: one row per object per frame.
 | position_group | string | GK, DEF, MID, FWD |
 | started | bool | |
 | minutes_played | float32 | null if unknown |
+
+StatsBomb extra columns: `sb_positions` (every position played, with times, JSON), `sb_cards`.
+Unused substitutes have no position.
 
 ### players
 | column | type | notes |

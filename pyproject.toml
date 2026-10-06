@@ -45,3 +45,7 @@ select = ["E", "F", "I", "B", "UP"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.uv]
+# socceraction pins pandera 0.17, which imports multimethod.overload (removed in multimethod 2.0)
+constraint-dependencies = ["multimethod<2"]
