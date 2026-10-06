@@ -91,3 +91,41 @@ opens. Storage stays small: 1.3M results are 16 MB; one rating row per team per 
 - One Parquet file per match per table, so re-runs skip finished matches and a crash loses at
   most one match. DuckDB reads them all through one glob per table.
 - Shot freeze frames get the shooter added as the actor row (StatsBomb leaves it out).
+
+## 2026-10-06: PFF standardization choices and data problems found
+
+- **Own streaming reader, not kloppy.** kloppy's PFF loader holds a whole match in memory
+  (~170-255k frames). We read the .jsonl.bz2 line by line and write Parquet in chunks: peak
+  memory ~220 MB, ~4 min and ~50 MB per match.
+- **Players smoothed, ball raw.** Smoothed player positions sit a median 0.6 m (p90 2.8 m)
+  from raw: jitter removed, nothing lost. The smoothed ball is unusable on fast balls: median
+  3.6 m, p90 24 m from the raw ball in the final, and missing in 31k frames that have a raw
+  ball. PFF's own event positions use the raw ball.
+- **Direction from events, not metadata.** Each PFF event says which way the acting team
+  attacks; a majority vote per period sets the tracking flip. Metadata flags are only a
+  fallback, and disagreements are recorded in `matches.pff_direction_fixed_periods`.
+- **Shootout = period 5.** PFF files shootout kicks under period 4; everything after the
+  end of extra time moves to period 5. There is no tracking during the shootout; period-5
+  event times are seconds since the end of extra time.
+- **Scores from scored shots.** PFF has no score field. Own goals are not shots, so the
+  StatsBomb comparison is the check for them.
+- **Player labels wrong in the final's extra time.** In periods 3-4 of 10517 the positions
+  under Argentina's labels are France's players and the other way round (Messi appears as
+  "France 10", Lloris as "Argentina 23"). Detected two ways: both goalkeepers on the wrong
+  side all period (`matches.pff_label_suspect_periods`), and StatsBomb events landing on the
+  wrong team's tracked players (`sync_quality.labels_ok = false`). Not corrected: only shared
+  shirt numbers carry over, the rest are paired arbitrarily, so a relabel needs player
+  re-identification. A goalkeeper-only fix was tried and removed (it fixed 2 of 22 labels).
+- **Unified player_id = `<PFF name slug>_<birth date>`**, set for players linked across
+  StatsBomb and PFF; PFF has birth dates, StatsBomb does not.
+
+## 2026-10-06: StatsBomb <-> PFF linking
+
+- Players: paired on (match, team, shirt number); names only confirm (all 50 in the final).
+- Events: per period, the clock offset is the median time gap of same-player same-type
+  candidates (PFF runs 0.2-1.5 s ahead in the final). Pairs are then chosen one-to-one by
+  cost = time gap + 0.1 x distance (m) + 2 if the player differs, within 3 s. Shootouts use a
+  different zero point per provider (29.5 s apart in the final), so the offset search widens
+  to 90 s when the normal 10 s window finds nothing.
+- Every StatsBomb shot in the final is linked; passes 97%; clearances 71% (the providers
+  define clearances differently).

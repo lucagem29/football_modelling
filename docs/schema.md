@@ -85,6 +85,10 @@ StatsBomb shot frames leave out the shooter; we add the shooter as the `actor` r
 location so every frame is complete. 360 frames are anonymous (`source_player_id` null).
 
 ### tracking (one Parquet file per match)
+
+PFF: smoothed player positions, raw ball (see decisions.md); `pff_visibility`,
+`pff_confidence`, and the PFF event ids each frame belongs to (`pff_game_event_id`,
+`pff_possession_event_id`). No tracking during penalty shootouts.
 Path: `data/processed/tracking/source=<source>/match_id=<match_id>/part-0.parquet`.
 Long format: one row per object per frame.
 | column | type | notes |
@@ -153,7 +157,19 @@ odds (float32), closing (bool).
 `context/elo` (Club Elo): team_id (string), source_team_name (string), date_from, date_to (date),
 elo (float32), rank (int32), country (string), level (int8).
 
+### PFF columns
+- events: `pff_game_event_id`, `pff_possession_event_id`, `pff_game_event_type`,
+  `pff_event_type` (PA pass, CR cross, SH shot, CL clearance, BC carry, CH challenge, ...),
+  `pff_setpiece_type`, `pff_frame` (tracking frame of the event), `pff_video_time_s`,
+  `pff_attacking_direction`, `pff_extra` (all PFF event blocks as JSON). Event types with no
+  SPADL counterpart are `non_action`. `end_x/end_y` = start of the next event (SPADL rule).
+- matches: `kickoff_utc` is filled (PFF gives UTC), `pff_week`, `pff_fps`,
+  `pff_home_start_left`, `pff_direction_fixed_periods`, `pff_label_suspect_periods`.
+- players: `birth_date`, `height_cm` from PFF's players.csv.
+
 ## Crosswalk tables (`data/crosswalk/`)
+
+Crosswalks between two providers are partitioned by `pair=<a>_<b>` instead of `source=`.
 
 All crosswalks keep `method` (how the link was made: `exact_id`, `date_teams`, `name_dob`,
 `manual`, ...) and `confidence` (float32, 0 to 1).
@@ -167,9 +183,17 @@ match_id (string), source (string), source_match_id (string), method, confidence
 
 ### player_crosswalk
 player_id (string), source (string), source_player_id (string), name (string),
-birth_date (date), reep_id (string, null if not in Reep register), method, confidence.
+birth_date (date), reep_id (string, null if not in Reep register), method, confidence,
+name_similarity (0-1, check on the pairing).
 
 ### event_crosswalk
 match_id (string), source_a, event_id_a, source_b, event_id_b (string),
-time_diff_s (float32), dist_m (float32), method, confidence.
+time_diff_s (float32, after the per-period clock offset), dist_m (float32),
+same_player (bool), method, confidence.
 One row per linked pair; an event with no partner has no row.
+
+### sync_quality
+match_id, period, n_events, nearest_is_acting_team (share of linked events whose nearest
+tracked player belongs to the acting team), actor_gap_median_m (StatsBomb location vs the
+tracked position of the event's player), labels_ok (bool). Periods with labels_ok = false
+have unreliable player labels in tracking.
