@@ -1,15 +1,18 @@
 # Data sources
 
 Status values: `planned`, `downloaded`, `standardized`, `synced`.
-Row counts are filled in when a source is standardized.
+Row counts are filled in when a source is standardized. Download commands:
+`uv run python -m football_modelling.ingest.<module>` (module named per source below).
+Each run writes `data/raw/<source>/_manifest_*.json` with the upstream commit/article and
+per-file status. Disk size is as stored (large JSON/XML gzip-compressed, see decisions.md).
 
 ## Event data
 
-| Source | Scope | Licence | Status | Rows |
-|---|---|---|---|---|
-| StatsBomb Open Data (Hudl) | 80 seasons | free, attribution + logo required when publishing | planned | |
-| Wyscout (Pappalardo et al.) | ~1,941 matches | CC BY 4.0 | planned | |
-| Impect | Bundesliga 2023/24 (scope to check) | check | planned | |
+| Source | Module | Scope | Licence | Status | On disk |
+|---|---|---|---|---|---|
+| StatsBomb Open Data (Hudl) | `statsbomb` | 80 competition-seasons, 4,235 matches, 426 with 360 frames | StatsBomb terms: attribution + logo when publishing | downloaded | 1.6 GB (16 GB raw) |
+| Wyscout (Pappalardo et al.) | `wyscout` | ~1,941 matches | CC BY 4.0 | downloaded | 77 MB (zips) |
+| Impect | `impect` | Bundesliga 2023/24, all 306 matches | Impect terms (LICENSE.pdf): credit Impect + logo | downloaded | 126 MB (3.2 GB raw) |
 
 **StatsBomb Open Data**: https://github.com/hudl/open-data
 - Events, lineups, shot freeze frames. 360 frames (positions of all visible players at each
@@ -23,16 +26,18 @@ Row counts are filled in when a source is standardized.
 - ~1,941 matches: top-5 leagues 2017/18, WC 2018, Euro 2016. CC BY 4.0.
 
 **Impect**: https://github.com/ImpectAPI/open-data
-- Bundesliga 2023/24. Exact scope and licence still to check (task 05).
+- Bundesliga 2023/24, 306 matches: events, event KPIs, player KPIs, lineups, matches,
+  players, squads, KPI definitions. Logos in `img/` for attribution.
+- Each match carries id mappings to DFL (`heim_spiel`) and SkillCorner match ids.
 
 ## Tracking data
 
-| Source | Scope | Licence | Status | Rows |
-|---|---|---|---|---|
-| PFF FC WC 2022 | 64 matches, tracking + events | check download terms | downloaded | |
-| IDSSE | 7 Bundesliga / 2. Bundesliga matches | CC BY 4.0 | planned | |
-| SkillCorner | 10 A-League 2024/25 matches | check | planned | |
-| Metrica | 3 anonymized matches | check | planned | |
+| Source | Module | Scope | Licence | Status | On disk |
+|---|---|---|---|---|---|
+| PFF FC WC 2022 | (manual download) | 64 matches, tracking + events | check download terms | downloaded | 8.1 GB incl. zips |
+| IDSSE | `idsse` | 7 Bundesliga / 2. Bundesliga matches | CC BY 4.0 | downloaded | 352 MB (2.6 GB raw) |
+| SkillCorner | `skillcorner` | 20 A-League 2024/25 matches | MIT | downloaded | 241 MB (1.9 GB raw) |
+| Metrica | `metrica` | 3 anonymized matches | no licence stated | downloaded | 175 MB |
 
 **PFF FC World Cup 2022** (local, `data/raw/pff/`)
 - All 64 matches. Original zips kept next to the unzipped folders.
@@ -45,19 +50,22 @@ Row counts are filled in when a source is standardized.
 - `Rosters/<gameId>.json`: player id, shirt number, position, team, started.
 - `players.csv`, `competitions.csv`, spec PDFs, `PFF FC Change Log.docx`.
 
-**IDSSE**: https://github.com/spoho-datascience/idsse-data. TRACAB tracking + DFL events, CC BY 4.0.
+**IDSSE**: https://github.com/spoho-datascience/idsse-data, files from figshare article 28196177.
+Per match: DFL match information, raw events, raw observed positions (XML). CC BY 4.0.
 
-**SkillCorner**: https://github.com/SkillCorner/opendata. 10 A-League 2024/25 matches.
+**SkillCorner**: https://github.com/SkillCorner/opendata. 20 A-League 2024/25 matches (the
+catalog grew from 10). Per match: match.json, extrapolated tracking (JSONL, Git LFS upstream),
+dynamic events and phases of play (CSV).
 
 **Metrica**: https://github.com/metrica-sports/sample-data. 3 anonymized matches.
 
 ## Context data
 
-| Source | Scope | Status |
-|---|---|---|
-| International results | all internationals since 1872, incl. WC 2026; shootouts.csv, goalscorers.csv | planned |
-| football-data.co.uk | club results + betting odds, updated weekly | planned |
-| Club Elo | club strength over time | planned |
+| Source | Module | Scope | Licence | Status |
+|---|---|---|---|---|
+| International results | `international_results` | all internationals since 1872, incl. WC 2026; shootouts, goalscorers, former names | CC0 | downloaded |
+| football-data.co.uk | `football_data` | 22 main divisions 1993/94-2026/27 + 16 extra leagues, results + odds | check site terms | downloaded (68 MB) |
+| Club Elo | `clubelo` | club strength over time | check site terms | **missing**: API returns 502 since 2026-10-03; re-run the module later |
 
 - International results: https://github.com/martj42/international_results
 - football-data.co.uk: https://www.football-data.co.uk/data.php
