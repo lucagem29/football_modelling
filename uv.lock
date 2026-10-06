@@ -1153,7 +1153,7 @@ wheels = [
 
 [[package]]
 name = "kloppy"
-version = "3.19.0"
+version = "3.19.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fsspec", extra = ["http"] },
@@ -1162,9 +1162,9 @@ dependencies = [
     { name = "pytz" },
     { name = "sortedcontainers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ed/8d/c2eec47447c95dd54298203d38d260d40eb4f33d5ca24513010590a31106/kloppy-3.19.0.tar.gz", hash = "sha256:ffdc621ad72218933e7af3b3b21c0b754f6ef58861b7c24e22a5e9b736b59611", size = 39511871, upload-time = "2026-06-07T10:23:49.484Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/02/b9b5108adb96a3d14c076ac19d116047333f52d10bb8c292ed371175664d/kloppy-3.19.1.tar.gz", hash = "sha256:c2e592f8728a0bbe07566f048938b84edb0352064864996a150973a5d7c0ac0a", size = 39639288, upload-time = "2026-10-03T13:16:37.88Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d1/f3/6b910466d3be70d4194e2fa65cf81fd309cd5a277ca9fc322f59d635298b/kloppy-3.19.0-py3-none-any.whl", hash = "sha256:5c3a931735f097eb4c5661730b68bb37681a97dc48a4b8b5671a0507b8bd7f92", size = 30121375, upload-time = "2026-06-07T10:23:45.644Z" },
+    { url = "https://files.pythonhosted.org/packages/82/f4/6c1c077d301f8ae58148b801f8ead66e7e75b9ebff38102aa601f8f91f2e/kloppy-3.19.1-py3-none-any.whl", hash = "sha256:bdb468cc7b23a6c58276fdd8dbdb9c331e8cf4be8b721fdb97b7ec69d186b5ba", size = 30133667, upload-time = "2026-10-03T13:16:35.051Z" },
 ]
 
 [[package]]

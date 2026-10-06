@@ -59,17 +59,33 @@ dynamic events and phases of play (CSV).
 
 **Metrica**: https://github.com/metrica-sports/sample-data. 3 anonymized matches.
 
+## Identity and player data
+
+| Source | Module | Scope | Licence | Status | On disk |
+|---|---|---|---|---|---|
+| Reep Register | `reep` | 444,707 people, 45,337 teams, competitions, seasons; ids of 40+ providers anchored on Wikidata | CC0 | downloaded | 27 MB (141 MB raw) |
+| Transfermarkt datasets (dcaribou) | `transfermarkt` | players, clubs, games, appearances, lineups, game events, valuations, transfers | CC0 | downloaded | 230 MB (zip of csv.gz) |
+
+- Reep has id columns for Wyscout, Impect, SkillCorner, DFL (`key_heimspiel`), Transfermarkt,
+  Opta, FBref and more, but **none for StatsBomb or PFF**: those players are linked by name,
+  birth date and team in task 07.
+- Transfermarkt: upstream stopped refreshing recent data; the published snapshot stays usable.
+
 ## Context data
 
 | Source | Module | Scope | Licence | Status |
 |---|---|---|---|---|
 | International results | `international_results` | all internationals since 1872, incl. WC 2026; shootouts, goalscorers, former names | CC0 | downloaded |
 | football-data.co.uk | `football_data` | 22 main divisions 1993/94-2026/27 + 16 extra leagues, results + odds | check site terms | downloaded (68 MB) |
-| Club Elo | `clubelo` | club strength over time | check site terms | **missing**: API returns 502 since 2026-10-03; re-run the module later |
+| World results (schochastics) | `world_results` | 1,309,501 results, 207 top-tier leagues + 20 international club tournaments, 1888-2025-09 | ODC-BY (credit schochastics/football-data) | downloaded (16 MB) |
+| openfootball World Cups | `openfootball_worldcup` | men's World Cups 1930-2026: rounds, groups, venues, goals; squads for recent tournaments | CC0 | downloaded (3 MB) |
+| Club Elo | `clubelo` | club strength over time | check site terms | **not available**: the CSV API moved behind a login and registration is closed (checked 2026-10-06). We compute our own Elo instead (task 02) |
 
 - International results: https://github.com/martj42/international_results
 - football-data.co.uk: https://www.football-data.co.uk/data.php
-- Club Elo: http://clubelo.com (API at http://api.clubelo.com)
+- Club Elo: http://clubelo.com (API at http://api.clubelo.com, login only since 2026-10)
+- World results: https://github.com/schochastics/football-data (only `data/results` mirrored)
+- openfootball World Cups: https://github.com/openfootball/worldcup.json
 
 ## Aggregate data (no events, no tracking)
 
@@ -113,7 +129,11 @@ for the in-contest share of possession have team `CONTEST` and no `match_team_id
 - kloppy (loads most providers into one model): https://github.com/PySport/kloppy
 - socceraction (SPADL, VAEP, xT): https://github.com/ML-KULeuven/socceraction
 - Reep Register (player / team id register across providers): https://github.com/withqwerty/reep
-- Overview of open football data: https://github.com/withqwerty/open-football
+- DataBallPy (MIT): loads and synchronises event + tracking data, ships the 7 DFL matches.
+  Not installed: it pins `pyarrow<23` and `numpy<2.3`, older than ours. Its event-tracking
+  sync method is a reference for task 08.
+- The overview of open football data that lists most of these sources is
+  https://github.com/withqwerty/open-football (same author as the Reep Register).
 
 ## What can be linked to what
 
@@ -128,3 +148,18 @@ for the in-contest share of possession have team `CONTEST` and no `match_team_id
 - Bundesliga 2023/24 StatsBomb <-> Impect (to check: StatsBomb only has Leverkusen matches).
 
 **Not linkable:** IDSSE, SkillCorner, Metrica (no overlap with other providers).
+
+## Checked and not added (2026-10-06)
+
+| Source | Why not |
+|---|---|
+| SoccerMon (Zenodo, CC BY 4.0) | 99 GB of GPS data from two women's teams; far too large, and training load rather than match positions |
+| SoccerNet | video behind an access form (NDA); video models are out of scope |
+| Fjelstul World Cup database | CC BY-NC-SA: no commercial use; openfootball + Reep + Transfermarkt cover it |
+| European Soccer Database (Kaggle) | needs a Kaggle account; 2008-2016 only, covered by football-data.co.uk and Transfermarkt |
+| Alfheim / Tromsø (Simula) | 3 matches from 2013, research use only |
+| eloratings.net | no licence stated; national-team Elo is computed from international results instead |
+| FiveThirtyEight SPI | offline since the site shut down |
+| FBref, Understat, WhoScored | terms forbid scraping and reuse |
+| Last Row, Dynasty Scouting League, wosostats | too small or amateur; low value |
+| openfootball football.json, footballcsv | duplicates football-data.co.uk with less detail |

@@ -238,7 +238,8 @@ def mirror_github(
         return run
 
     results = run_parallel((job(b) for b in blobs), workers=workers, desc=repo)
-    write_manifest(dest, repo.split("/")[-1], {"repo": repo, "commit": commit, "files": results})
+    name = repo.split("/")[-1].replace(".", "-")
+    write_manifest(dest, name, {"repo": repo, "commit": commit, "files": results})
     raise_on_errors(results, repo)
     return results
 

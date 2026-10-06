@@ -56,3 +56,12 @@ shared GitHub mirror (works from any folder, pins the upstream commit in a manif
 hand-transcribed chart values are code, so they are versioned and the CSVs can be rebuilt
 from them; the shipped CSVs were checked to be identical to the code output. The chart
 value files are excluded from `ruff format` to keep their compact table layout.
+
+## 2026-10-06: Compute our own Elo; Club Elo API closed
+
+Club Elo's CSV API moved behind a login with registration closed (every ratings endpoint
+returns 502, `/Fixtures` says "Fixtures API deactivated"; same finding in soccerdata issue #977).
+The website only carries ratings from about 2022-09. Instead we compute Elo ourselves from
+open results (world_results ODC-BY, football-data.co.uk, international results CC0): full
+history, own formula, no licence question. The `clubelo` loader stays for when registration
+opens. Storage stays small: 1.3M results are 16 MB; one rating row per team per match.
