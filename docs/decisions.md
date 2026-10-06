@@ -29,3 +29,20 @@ back to socceraction 1.1.1 (2021). Lift the cap when socceraction supports panda
 - `match_id = <date>_<home team_id>_<away team_id>`: readable, and every provider produces the
   same id once its teams are in team_crosswalk. If two providers disagree on the date
   (time zones), match_crosswalk overrides.
+
+## 2026-10-03: Large raw text files are stored gzip-compressed
+
+The disk has ~20 GB free; the missing sources are ~23.5 GB uncompressed (StatsBomb alone
+~16 GB). JSON, JSONL and XML from StatsBomb, Impect, SkillCorner and IDSSE are stored as
+`<name>.gz`, compressed while downloading. Integrity checks (git blob sha, LFS sha256,
+figshare md5) run on the uncompressed bytes, so the content is byte-identical to upstream.
+kloppy, polars and the standard library read `.gz` directly. Small sources (Metrica,
+international results, football-data, Club Elo) and Wyscout zips stay as downloaded.
+The 64 StatsBomb WC 2022 files that Codex downloaded uncompressed were verified against
+upstream and compressed in place.
+
+## 2026-10-03: All download code lives in src/football_modelling/ingest/
+
+Codex's first-batch scripts were written into `data/raw/` (not versioned). They are ported to
+one module per source in `ingest/` and the originals kept in `data/raw/_codex/` for reference.
+Each run writes `data/raw/<source>/_manifest_<name>.json` (commit or article, per-file status).
